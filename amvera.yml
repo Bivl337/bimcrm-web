@@ -1,9 +1,14 @@
+# Amvera UI typically runs Node as "npm" (server), not "browser".
+# This config builds Vite and serves dist/ — matches Missing script: start errors.
 meta:
   environment: node
   toolchain:
-    name: browser
+    name: npm
     version: "20"
 
 build:
-  artifacts:
-    "dist/*": /
+  additionalCommands: npm run build
+
+run:
+  command: npm run start
+  containerPort: 80
