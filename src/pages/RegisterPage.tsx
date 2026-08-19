@@ -12,7 +12,7 @@ export function RegisterPage() {
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
 
-  if (!loading && me) return <Navigate to="/" replace />;
+  if (!loading && me) return <Navigate to="/tasks" replace />;
 
   const onSubmit = async (e: FormEvent) => {
     e.preventDefault();

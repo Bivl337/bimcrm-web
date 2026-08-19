@@ -20,9 +20,10 @@ export default function App() {
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
           <Route element={<AppLayout />}>
-            <Route path="/" element={<PipelinePage />} />
+            <Route path="/" element={<Navigate to="/tasks" replace />} />
             <Route path="/tasks" element={<TasksPage />} />
             <Route path="/projects" element={<ProjectsPage />} />
+            <Route path="/pipeline" element={<PipelinePage />} />
             <Route path="/contacts" element={<ContactsPage />} />
             <Route path="/companies" element={<CompaniesPage />} />
             <Route path="/analytics" element={<AnalyticsPage />} />
