@@ -45,15 +45,34 @@ export function RegisterPage() {
         </div>
         <label className="label">
           {t(locale, "fullName")}
-          <input className="input" required value={fullName} onChange={(e) => setFullName(e.target.value)} />
+          <input
+            className="input"
+            required
+            disabled={busy}
+            value={fullName}
+            onChange={(e) => setFullName(e.target.value)}
+          />
         </label>
         <label className="label">
           {t(locale, "orgName")}
-          <input className="input" required value={orgName} onChange={(e) => setOrgName(e.target.value)} />
+          <input
+            className="input"
+            required
+            disabled={busy}
+            value={orgName}
+            onChange={(e) => setOrgName(e.target.value)}
+          />
         </label>
         <label className="label">
           {t(locale, "email")}
-          <input className="input" type="email" required value={email} onChange={(e) => setEmail(e.target.value)} />
+          <input
+            className="input"
+            type="email"
+            required
+            disabled={busy}
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+          />
         </label>
         <label className="label">
           {t(locale, "password")}
@@ -62,6 +81,7 @@ export function RegisterPage() {
             type="password"
             required
             minLength={6}
+            disabled={busy}
             value={password}
             onChange={(e) => setPassword(e.target.value)}
           />
@@ -71,6 +91,7 @@ export function RegisterPage() {
           <select
             className="select"
             value={locale}
+            disabled={busy}
             onChange={(e) => setLocale(e.target.value as Locale)}
           >
             <option value="ru">Русский</option>
@@ -79,10 +100,18 @@ export function RegisterPage() {
         </label>
         {error && <div className="error">{error}</div>}
         <button className="btn" disabled={busy}>
-          {t(locale, "register")}
+          {busy ? (
+            <span className="btn-loading">
+              <span className="btn-spinner" aria-hidden />
+              {t(locale, "registering")}
+            </span>
+          ) : (
+            t(locale, "register")
+          )}
         </button>
         <div className="muted" style={{ textAlign: "center" }}>
-          {t(locale, "haveAccount")} <Link to="/login">{t(locale, "login")}</Link>
+          {t(locale, "haveAccount")}{" "}
+          {busy ? t(locale, "login") : <Link to="/login">{t(locale, "login")}</Link>}
         </div>
       </form>
     </div>

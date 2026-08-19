@@ -152,6 +152,33 @@ button {
   background: var(--blue-dark);
 }
 
+.btn:disabled {
+  opacity: 0.75;
+  cursor: wait;
+}
+
+.btn-loading {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.btn-spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255, 255, 255, 0.35);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: btn-spin 0.7s linear infinite;
+}
+
+@keyframes btn-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 .btn.secondary {
   background: #fff;
   color: var(--ink);

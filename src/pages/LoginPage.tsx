@@ -37,7 +37,14 @@ export function LoginPage() {
         </div>
         <label className="label">
           {t(locale, "email")}
-          <input className="input" type="email" required value={email} onChange={(e) => setEmail(e.target.value)} />
+          <input
+            className="input"
+            type="email"
+            required
+            disabled={busy}
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+          />
         </label>
         <label className="label">
           {t(locale, "password")}
@@ -45,16 +52,25 @@ export function LoginPage() {
             className="input"
             type="password"
             required
+            disabled={busy}
             value={password}
             onChange={(e) => setPassword(e.target.value)}
           />
         </label>
         {error && <div className="error">{error}</div>}
         <button className="btn" disabled={busy}>
-          {t(locale, "login")}
+          {busy ? (
+            <span className="btn-loading">
+              <span className="btn-spinner" aria-hidden />
+              {t(locale, "loggingIn")}
+            </span>
+          ) : (
+            t(locale, "login")
+          )}
         </button>
         <div className="muted" style={{ textAlign: "center" }}>
-          {t(locale, "noAccount")} <Link to="/register">{t(locale, "register")}</Link>
+          {t(locale, "noAccount")}{" "}
+          {busy ? t(locale, "register") : <Link to="/register">{t(locale, "register")}</Link>}
         </div>
       </form>
     </div>
