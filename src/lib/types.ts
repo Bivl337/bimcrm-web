@@ -71,6 +71,17 @@ export interface Company {
   created_at: string;
 }
 
+export interface Project {
+  id: number;
+  name: string;
+  description: string | null;
+  status: "active" | "archived";
+  start_date: string | null;
+  end_date: string | null;
+  responsible_user_id: number | null;
+  created_at: string;
+}
+
 export interface Task {
   id: number;
   title: string;
@@ -78,10 +89,12 @@ export interface Task {
   status: "todo" | "in_progress" | "done" | "open";
   deal_id: number | null;
   contact_id: number | null;
+  project_id: number | null;
   assignee_id: number | null;
   created_by_id: number;
   due_at: string | null;
   started_at: string | null;
+  completed_at: string | null;
   estimate_hours: number | null;
   created_at: string;
 }
@@ -110,6 +123,25 @@ export interface Analytics {
   total_amount: string | number;
   open_tasks: number;
   by_stage: { stage_id: number; stage_name: string; deals_count: number; amount_sum: string | number }[];
+}
+
+export interface TaskAnalytics {
+  date_from: string | null;
+  date_to: string | null;
+  by_person: {
+    user_id: number;
+    full_name: string;
+    done_count: number;
+    avg_hours_to_done: number | null;
+    avg_estimate_hours: number | null;
+  }[];
+  by_project: {
+    project_id: number | null;
+    project_name: string;
+    done_count: number;
+    avg_hours_to_done: number | null;
+    avg_estimate_hours: number | null;
+  }[];
 }
 
 export interface CustomField {

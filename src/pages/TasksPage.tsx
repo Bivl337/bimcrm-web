@@ -12,7 +12,8 @@ import {
 import { api } from "../lib/api";
 import { useAuth } from "../lib/auth";
 import { t } from "../i18n";
-import type { Member, Task } from "../lib/types";
+import type { Member, Project, Task } from "../lib/types";
+import { MarkdownView } from "../components/MarkdownView";
 
 type TaskStatus = "todo" | "in_progress" | "done";
 
@@ -41,6 +42,11 @@ function fmtDate(value: string | null | undefined, locale: string) {
 function memberName(members: Member[], userId: number | null | undefined) {
   if (!userId) return "—";
   return members.find((m) => m.user_id === userId)?.full_name || `#${userId}`;
+}
+
+function projectName(projects: Project[], projectId: number | null | undefined, locale: "ru" | "en") {
+  if (!projectId) return t(locale, "noProject");
+  return projects.find((p) => p.id === projectId)?.name || `#${projectId}`;
 }
 
 function Column({
@@ -74,12 +80,14 @@ function Column({
 function TaskCard({
   task,
   members,
+  projects,
   locale,
   disabled,
   onOpen,
 }: {
   task: Task;
   members: Member[];
+  projects: Project[];
   locale: "ru" | "en";
   disabled?: boolean;
   onOpen: () => void;
@@ -96,6 +104,9 @@ function TaskCard({
     <div ref={setNodeRef} style={style} {...listeners} {...attributes}>
       <div className={`deal-card ${isDragging ? "dragging" : ""}`} onClick={onOpen}>
         <div style={{ fontWeight: 700 }}>{task.title}</div>
+        <div style={{ marginTop: 8 }}>
+          <span className="chip">{projectName(projects, task.project_id, locale)}</span>
+        </div>
         <div className="muted" style={{ fontSize: 12, marginTop: 6 }}>
           {t(locale, "assignee")}: {memberName(members, task.assignee_id)}
         </div>
@@ -116,13 +127,16 @@ export function TasksPage() {
   const { locale, canWrite, me } = useAuth();
   const [tasks, setTasks] = useState<Task[]>([]);
   const [members, setMembers] = useState<Member[]>([]);
+  const [projects, setProjects] = useState<Project[]>([]);
   const [filterAssignee, setFilterAssignee] = useState<string>("all");
   const [active, setActive] = useState<Task | null>(null);
   const [showCreate, setShowCreate] = useState(false);
   const [edit, setEdit] = useState<Task | null>(null);
 
   const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
   const [assigneeId, setAssigneeId] = useState<string>("");
+  const [projectId, setProjectId] = useState<string>("");
   const [dueAt, setDueAt] = useState("");
   const [estimate, setEstimate] = useState("");
 
@@ -130,12 +144,14 @@ export function TasksPage() {
 
   const load = async () => {
     const q = filterAssignee === "all" ? "" : `?assignee_id=${filterAssignee}`;
-    const [ts, ms] = await Promise.all([
+    const [ts, ms, ps] = await Promise.all([
       api<Task[]>(`/api/tasks${q}`),
       api<Member[]>("/api/members"),
+      api<Project[]>("/api/projects"),
     ]);
     setTasks(ts.map((x) => ({ ...x, status: normalizeStatus(x.status) })));
     setMembers(ms);
+    setProjects(ps);
     if (!assigneeId && me) setAssigneeId(String(me.user.id));
   };
 
@@ -177,7 +193,9 @@ export function TasksPage() {
   const create = async () => {
     const body: Record<string, unknown> = {
       title,
+      description: description || null,
       assignee_id: Number(assigneeId || me?.user.id),
+      project_id: projectId ? Number(projectId) : null,
       status: "todo",
     };
     if (dueAt) body.due_at = new Date(dueAt).toISOString();
@@ -185,8 +203,10 @@ export function TasksPage() {
     await api("/api/tasks", { method: "POST", body: JSON.stringify(body) });
     setShowCreate(false);
     setTitle("");
+    setDescription("");
     setDueAt("");
     setEstimate("");
+    setProjectId("");
     await load();
   };
 
@@ -194,7 +214,9 @@ export function TasksPage() {
     if (!edit) return;
     const body: Record<string, unknown> = {
       title: edit.title,
+      description: edit.description,
       assignee_id: edit.assignee_id,
+      project_id: edit.project_id,
       status: normalizeStatus(edit.status),
       estimate_hours: edit.estimate_hours,
       due_at: edit.due_at,
@@ -256,6 +278,7 @@ export function TasksPage() {
                   key={task.id}
                   task={task}
                   members={members}
+                  projects={projects}
                   locale={locale}
                   disabled={!canWrite}
                   onOpen={() => setEdit(task)}
@@ -282,6 +305,29 @@ export function TasksPage() {
               <input className="input" value={title} onChange={(e) => setTitle(e.target.value)} />
             </label>
             <label className="label">
+              {t(locale, "description")}
+              <textarea
+                className="textarea"
+                rows={6}
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                placeholder="Markdown, https://..."
+              />
+            </label>
+            <label className="label">
+              {t(locale, "project")}
+              <select className="select" value={projectId} onChange={(e) => setProjectId(e.target.value)}>
+                <option value="">{t(locale, "noProject")}</option>
+                {projects
+                  .filter((p) => p.status === "active")
+                  .map((p) => (
+                    <option key={p.id} value={p.id}>
+                      {p.name}
+                    </option>
+                  ))}
+              </select>
+            </label>
+            <label className="label">
               {t(locale, "assignee")}
               <select className="select" value={assigneeId} onChange={(e) => setAssigneeId(e.target.value)}>
                 {members.map((m) => (
@@ -297,7 +343,14 @@ export function TasksPage() {
             </label>
             <label className="label">
               {t(locale, "estimateHours")}
-              <input className="input" type="number" min={0} step={0.5} value={estimate} onChange={(e) => setEstimate(e.target.value)} />
+              <input
+                className="input"
+                type="number"
+                min={0}
+                step={0.5}
+                value={estimate}
+                onChange={(e) => setEstimate(e.target.value)}
+              />
             </label>
             <div className="row">
               <button className="btn" onClick={create} disabled={!title.trim()}>
@@ -323,6 +376,39 @@ export function TasksPage() {
                 disabled={!canWrite}
                 onChange={(e) => setEdit({ ...edit, title: e.target.value })}
               />
+            </label>
+            <label className="label">
+              {t(locale, "description")}
+              <textarea
+                className="textarea"
+                rows={6}
+                value={edit.description || ""}
+                disabled={!canWrite}
+                onChange={(e) => setEdit({ ...edit, description: e.target.value })}
+              />
+            </label>
+            {edit.description && (
+              <div className="card" style={{ padding: 12 }}>
+                <MarkdownView text={edit.description} />
+              </div>
+            )}
+            <label className="label">
+              {t(locale, "project")}
+              <select
+                className="select"
+                disabled={!canWrite}
+                value={edit.project_id ?? ""}
+                onChange={(e) =>
+                  setEdit({ ...edit, project_id: e.target.value ? Number(e.target.value) : null })
+                }
+              >
+                <option value="">{t(locale, "noProject")}</option>
+                {projects.map((p) => (
+                  <option key={p.id} value={p.id}>
+                    {p.name}
+                  </option>
+                ))}
+              </select>
             </label>
             <label className="label">
               {t(locale, "assignee")}
