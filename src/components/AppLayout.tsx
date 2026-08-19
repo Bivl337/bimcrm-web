@@ -23,12 +23,12 @@ export function AppLayout() {
           </div>
         </div>
         <nav className="nav">
+          <NavLink to="/tasks">{t(locale, "tasks")}</NavLink>
           <NavLink to="/" end>
             {t(locale, "pipeline")}
           </NavLink>
           <NavLink to="/contacts">{t(locale, "contacts")}</NavLink>
           <NavLink to="/companies">{t(locale, "companies")}</NavLink>
-          <NavLink to="/tasks">{t(locale, "tasks")}</NavLink>
           <NavLink to="/analytics">{t(locale, "analytics")}</NavLink>
           <NavLink to="/settings">{t(locale, "settings")}</NavLink>
         </nav>

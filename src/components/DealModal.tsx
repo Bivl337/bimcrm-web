@@ -81,9 +81,10 @@ export function DealModal({
 
   const toggleTask = async (task: Task) => {
     if (!canWrite) return;
+    const next = task.status === "done" ? "todo" : "done";
     await api(`/api/tasks/${task.id}`, {
       method: "PATCH",
-      body: JSON.stringify({ status: task.status === "open" ? "done" : "open" }),
+      body: JSON.stringify({ status: next }),
     });
     await load();
     onChanged();
@@ -148,7 +149,7 @@ export function DealModal({
                 </span>
                 {canWrite && (
                   <button className="btn secondary" onClick={() => toggleTask(task)}>
-                    {task.status === "open" ? t(locale, "markDone") : t(locale, "open")}
+                    {task.status === "done" ? t(locale, "todo") : t(locale, "markDone")}
                   </button>
                 )}
               </div>

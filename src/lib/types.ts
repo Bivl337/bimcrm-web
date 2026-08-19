@@ -75,11 +75,23 @@ export interface Task {
   id: number;
   title: string;
   description: string | null;
-  status: "open" | "done";
+  status: "todo" | "in_progress" | "done" | "open";
   deal_id: number | null;
   contact_id: number | null;
   assignee_id: number | null;
+  created_by_id: number;
   due_at: string | null;
+  started_at: string | null;
+  estimate_hours: number | null;
+  created_at: string;
+}
+
+export interface Member {
+  membership_id: number;
+  user_id: number;
+  email: string;
+  full_name: string;
+  role: Role;
   created_at: string;
 }
 
