@@ -23,7 +23,7 @@ export class ApiError extends Error {
 const RETRY_DELAYS_MS = [800, 2000];
 const REQUEST_TIMEOUT_MS = 20000;
 const NETWORK_ERROR_MESSAGE =
-  "Нет связи с сервером. Проверьте интернет или попробуйте ещё раз через несколько секунд.";
+  "Нет связи с сервером. Проверьте интернет или попробуйте ещё раз через несколько секунд. Если включён VPN — отключите его или добавьте сайт в исключения VPN.";
 
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
