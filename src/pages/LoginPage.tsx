@@ -1,6 +1,7 @@
 import { FormEvent, useState } from "react";
 import { Link, Navigate } from "react-router-dom";
 import { useAuth } from "../lib/auth";
+import { ApiError } from "../lib/api";
 import { t } from "../i18n";
 
 export function LoginPage() {
@@ -19,7 +20,11 @@ export function LoginPage() {
     try {
       await login(email, password);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Error");
+      if (err instanceof ApiError && err.status === 401) {
+        setError(locale === "en" ? "Wrong email or password" : "Неверный email или пароль");
+      } else {
+        setError(err instanceof Error ? err.message : "Error");
+      }
     } finally {
       setBusy(false);
     }

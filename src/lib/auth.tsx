@@ -1,5 +1,5 @@
 import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
-import { api, getToken, setToken } from "./api";
+import { api, ApiError, getToken, setToken } from "./api";
 import type { Locale } from "../i18n";
 import type { Me } from "./types";
 
@@ -17,7 +17,7 @@ interface AuthState {
     locale: Locale;
   }) => Promise<void>;
   logout: () => void;
-  refresh: () => Promise<void>;
+  refresh: (strict?: boolean) => Promise<void>;
   canWrite: boolean;
 }
 
@@ -35,7 +35,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     localStorage.setItem("bimcrm_locale", l);
   };
 
-  const refresh = async () => {
+  const refresh = async (strict = false) => {
     if (!getToken()) {
       setMe(null);
       setLoading(false);
@@ -47,9 +47,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (data.user.locale === "ru" || data.user.locale === "en") {
         setLocale(data.user.locale);
       }
-    } catch {
-      setToken(null);
-      setMe(null);
+    } catch (err) {
+      // Log out only if the token is really invalid; a temporary network/server error
+      // must not throw the user out of the account.
+      if (err instanceof ApiError && (err.status === 401 || err.status === 403)) {
+        setToken(null);
+        setMe(null);
+      }
+      // During login/register the caller must see the error instead of silently staying on the form.
+      if (strict) throw err;
     } finally {
       setLoading(false);
     }
@@ -65,7 +71,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       body: JSON.stringify({ email, password }),
     });
     setToken(res.access_token);
-    await refresh();
+    await refresh(true);
   };
 
   const register = async (data: {
@@ -80,7 +86,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       body: JSON.stringify(data),
     });
     setToken(res.access_token);
-    await refresh();
+    await refresh(true);
   };
 
   const logout = () => {
