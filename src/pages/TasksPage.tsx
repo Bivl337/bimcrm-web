@@ -14,6 +14,7 @@ import { useAuth } from "../lib/auth";
 import { t } from "../i18n";
 import type { Member, Project, Task } from "../lib/types";
 import { MarkdownView } from "../components/MarkdownView";
+import { IconCalendar, IconClock, IconPlus, initials } from "../components/Icons";
 
 type TaskStatus = "todo" | "in_progress" | "done";
 
@@ -39,6 +40,10 @@ function fmtDate(value: string | null | undefined, locale: string) {
   });
 }
 
+function isOverdue(task: Task) {
+  return !!task.due_at && task.status !== "done" && new Date(task.due_at).getTime() < Date.now();
+}
+
 function memberName(members: Member[], userId: number | null | undefined) {
   if (!userId) return "—";
   return members.find((m) => m.user_id === userId)?.full_name || `#${userId}`;
@@ -54,25 +59,30 @@ function Column({
   title,
   color,
   count,
+  emptyLabel,
   children,
 }: {
   id: string;
   title: string;
   color: string;
   count: number;
+  emptyLabel: string;
   children: React.ReactNode;
 }) {
   const { setNodeRef, isOver } = useDroppable({ id });
   return (
-    <div className="column" ref={setNodeRef} style={{ outline: isOver ? `2px solid ${color}` : undefined }}>
+    <div
+      className={`column ${isOver ? "is-over" : ""}`}
+      ref={setNodeRef}
+      style={{ "--stage": color } as React.CSSProperties}
+    >
       <div className="column-head">
-        <h3 style={{ display: "flex", alignItems: "center", gap: 8, margin: 0 }}>
-          <span style={{ width: 10, height: 10, borderRadius: 99, background: color, display: "inline-block" }} />
-          {title}
-        </h3>
+        <h3>{title}</h3>
         <span className="pill">{count}</span>
       </div>
-      <div className="column-body">{children}</div>
+      <div className="column-body">
+        {count === 0 ? <div className="column-empty">{emptyLabel}</div> : children}
+      </div>
     </div>
   );
 }
@@ -103,21 +113,34 @@ function TaskCard({
   return (
     <div ref={setNodeRef} style={style} {...listeners} {...attributes}>
       <div className={`deal-card ${isDragging ? "dragging" : ""}`} onClick={onOpen}>
-        <div style={{ fontWeight: 700 }}>{task.title}</div>
-        <div style={{ marginTop: 8 }}>
-          <span className="chip">{projectName(projects, task.project_id, locale)}</span>
-        </div>
-        <div className="muted" style={{ fontSize: 12, marginTop: 6 }}>
-          {t(locale, "assignee")}: {memberName(members, task.assignee_id)}
-        </div>
-        <div className="muted" style={{ fontSize: 12 }}>
-          {t(locale, "due")}: {fmtDate(task.due_at, locale)}
-        </div>
-        {task.estimate_hours != null && (
-          <div className="muted" style={{ fontSize: 12 }}>
-            {t(locale, "estimateHours")}: {task.estimate_hours}
+        <div className="card-title">{task.title}</div>
+        {task.project_id != null && (
+          <div>
+            <span className="chip">{projectName(projects, task.project_id, locale)}</span>
           </div>
         )}
+        <div className="card-foot">
+          <div className="row" style={{ gap: 12 }}>
+            {task.due_at && (
+              <span className={`card-meta ${isOverdue(task) ? "overdue" : ""}`}>
+                <IconCalendar size={14} />
+                {fmtDate(task.due_at, locale)}
+              </span>
+            )}
+            {task.estimate_hours != null && (
+              <span className="card-meta" title={t(locale, "estimateHours")}>
+                <IconClock size={14} />
+                {task.estimate_hours} {locale === "ru" ? "ч" : "h"}
+              </span>
+            )}
+          </div>
+          <span
+            className="avatar sm"
+            title={`${t(locale, "assignee")}: ${memberName(members, task.assignee_id)}`}
+          >
+            {initials(memberName(members, task.assignee_id))}
+          </span>
+        </div>
       </div>
     </div>
   );
@@ -249,6 +272,7 @@ export function TasksPage() {
           </label>
           {canWrite && (
             <button className="btn" onClick={() => setShowCreate(true)}>
+              <IconPlus size={16} />
               {t(locale, "createTask")}
             </button>
           )}
@@ -272,6 +296,7 @@ export function TasksPage() {
               title={t(locale, col.labelKey)}
               color={col.color}
               count={byStatus[col.id].length}
+              emptyLabel={t(locale, "noTasksHere")}
             >
               {byStatus[col.id].map((task) => (
                 <TaskCard
@@ -289,8 +314,8 @@ export function TasksPage() {
         </div>
         <DragOverlay>
           {active ? (
-            <div className="deal-card">
-              <div style={{ fontWeight: 700 }}>{active.title}</div>
+            <div className="deal-card overlay">
+              <div className="card-title">{active.title}</div>
             </div>
           ) : null}
         </DragOverlay>

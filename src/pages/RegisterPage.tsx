@@ -2,6 +2,7 @@ import { FormEvent, useState } from "react";
 import { Link, Navigate } from "react-router-dom";
 import { useAuth } from "../lib/auth";
 import { t, type Locale } from "../i18n";
+import { AuthLayout } from "../components/AuthLayout";
 
 export function RegisterPage() {
   const { register, me, loading, locale, setLocale } = useAuth();
@@ -34,13 +35,10 @@ export function RegisterPage() {
   };
 
   return (
-    <div className="auth-page">
+    <AuthLayout>
       <form className="card auth-card form-grid" onSubmit={onSubmit}>
         <div className="auth-logo">
-          <img src="/logo.png" alt="bimCRM" />
-          <div className="brand-title" style={{ fontSize: 22 }}>
-            bim<span>CRM</span>
-          </div>
+          <h1>{t(locale, "register")}</h1>
           <div className="muted">{t(locale, "welcome")}</div>
         </div>
         <label className="label">
@@ -109,11 +107,11 @@ export function RegisterPage() {
             t(locale, "register")
           )}
         </button>
-        <div className="muted" style={{ textAlign: "center" }}>
+        <div className="auth-alt">
           {t(locale, "haveAccount")}{" "}
           {busy ? t(locale, "login") : <Link to="/login">{t(locale, "login")}</Link>}
         </div>
       </form>
-    </div>
+    </AuthLayout>
   );
 }

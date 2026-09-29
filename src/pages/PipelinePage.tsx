@@ -12,6 +12,7 @@ import {
 import { useAuth } from "../lib/auth";
 import { api } from "../lib/api";
 import { t } from "../i18n";
+import { IconPlus } from "../components/Icons";
 import type { Deal, Pipeline } from "../lib/types";
 import { DealModal } from "../components/DealModal";
 
@@ -30,6 +31,7 @@ function StageColumn({
   color,
   count,
   sumLabel,
+  emptyLabel,
   children,
 }: {
   stageId: number;
@@ -37,26 +39,26 @@ function StageColumn({
   color: string;
   count: number;
   sumLabel: string;
+  emptyLabel: string;
   children: React.ReactNode;
 }) {
   const { setNodeRef, isOver } = useDroppable({ id: `stage-${stageId}` });
   return (
-    <div className="column" ref={setNodeRef} style={{ outline: isOver ? `2px solid ${color}` : undefined }}>
+    <div
+      className={`column ${isOver ? "is-over" : ""}`}
+      ref={setNodeRef}
+      style={{ "--stage": color } as React.CSSProperties}
+    >
       <div className="column-head">
         <div>
-          <h3 style={{ display: "flex", alignItems: "center", gap: 8 }}>
-            <span
-              style={{ width: 10, height: 10, borderRadius: 99, background: color, display: "inline-block" }}
-            />
-            {title}
-          </h3>
-          <div className="muted" style={{ fontSize: 12, marginTop: 4 }}>
-            {sumLabel}
-          </div>
+          <h3>{title}</h3>
+          <div className="column-sum">{sumLabel}</div>
         </div>
         <span className="pill">{count}</span>
       </div>
-      <div className="column-body">{children}</div>
+      <div className="column-body">
+        {count === 0 ? <div className="column-empty">{emptyLabel}</div> : children}
+      </div>
     </div>
   );
 }
@@ -89,7 +91,7 @@ function DraggableDeal({
           onOpen();
         }}
       >
-        <div style={{ fontWeight: 700 }}>{deal.title}</div>
+        <div className="card-title">{deal.title}</div>
         <div className="deal-amount">{formatMoney(deal.amount, deal.currency || currency)}</div>
       </div>
     </div>
@@ -184,6 +186,7 @@ export function PipelinePage() {
         <div className="row">
           {canWrite && (
             <button className="btn" onClick={() => setShowCreate(true)}>
+              <IconPlus size={16} />
               {t(locale, "createDeal")}
             </button>
           )}
@@ -217,6 +220,7 @@ export function PipelinePage() {
                 color={stage.color}
                 count={list.length}
                 sumLabel={formatMoney(sum, me?.organization.currency || "RUB")}
+                emptyLabel={t(locale, "noDealsHere")}
               >
                 {list.map((deal) => (
                   <DraggableDeal
@@ -233,8 +237,8 @@ export function PipelinePage() {
         </div>
         <DragOverlay>
           {activeDeal ? (
-            <div className="deal-card">
-              <div style={{ fontWeight: 700 }}>{activeDeal.title}</div>
+            <div className="deal-card overlay">
+              <div className="card-title">{activeDeal.title}</div>
               <div className="deal-amount">
                 {formatMoney(activeDeal.amount, activeDeal.currency || me?.organization.currency || "RUB")}
               </div>

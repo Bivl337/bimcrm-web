@@ -3,6 +3,7 @@ import { Link, Navigate } from "react-router-dom";
 import { useAuth } from "../lib/auth";
 import { ApiError } from "../lib/api";
 import { t } from "../i18n";
+import { AuthLayout } from "../components/AuthLayout";
 
 export function LoginPage() {
   const { login, me, loading, locale } = useAuth();
@@ -31,13 +32,10 @@ export function LoginPage() {
   };
 
   return (
-    <div className="auth-page">
+    <AuthLayout>
       <form className="card auth-card form-grid" onSubmit={onSubmit}>
         <div className="auth-logo">
-          <img src="/logo.png" alt="bimCRM" />
-          <div className="brand-title" style={{ fontSize: 22 }}>
-            bim<span>CRM</span>
-          </div>
+          <h1>{t(locale, "login")}</h1>
           <div className="muted">{t(locale, "welcome")}</div>
         </div>
         <label className="label">
@@ -73,11 +71,11 @@ export function LoginPage() {
             t(locale, "login")
           )}
         </button>
-        <div className="muted" style={{ textAlign: "center" }}>
+        <div className="auth-alt">
           {t(locale, "noAccount")}{" "}
           {busy ? t(locale, "register") : <Link to="/register">{t(locale, "register")}</Link>}
         </div>
       </form>
-    </div>
+    </AuthLayout>
   );
 }
