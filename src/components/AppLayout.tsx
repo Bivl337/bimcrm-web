@@ -47,13 +47,8 @@ const NAV: { group: DictKey; items: NavItem[] }[] = [
 function Brand({ org }: { org?: string }) {
   return (
     <div className="brand">
-      <img src="/logo.png" alt="" />
-      <div style={{ minWidth: 0 }}>
-        <div className="brand-title">
-          bim<span>CRM</span>
-        </div>
-        {org && <div className="brand-org">{org}</div>}
-      </div>
+      <img className="brand-logo" src="/logo-wide.png" alt="bimCRM" />
+      {org && <div className="brand-org">{org}</div>}
     </div>
   );
 }

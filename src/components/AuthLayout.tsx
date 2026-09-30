@@ -2,17 +2,24 @@ import type { ReactNode } from "react";
 import { useAuth } from "../lib/auth";
 import { t } from "../i18n";
 
+/** Renders a phrase where [word] is underlined, e.g. "Система под [любые] Ваши процессы". */
+export function Emphasis({ text }: { text: string }) {
+  const parts = text.split(/\[([^\]]+)\]/);
+  return (
+    <>
+      {parts.map((part, i) => (i % 2 === 1 ? <u key={i} className="u-emph">{part}</u> : part))}
+    </>
+  );
+}
+
 /** Split auth screen: blueprint panel with the product idea + the form. */
 export function AuthLayout({ children }: { children: ReactNode }) {
   const { locale } = useAuth();
   return (
     <div className="auth-split">
       <aside className="auth-aside">
-        <div className="brand">
-          <img src="/logo.png" alt="" />
-          <div className="brand-title">
-            bim<span>CRM</span>
-          </div>
+        <div className="auth-logo-tile">
+          <img src="/logo-wide.png" alt="bimCRM" />
         </div>
         <div className="auth-plan">
           <h2>{t(locale, "authHeadline")}</h2>

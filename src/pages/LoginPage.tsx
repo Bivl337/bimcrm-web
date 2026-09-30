@@ -3,7 +3,7 @@ import { Link, Navigate } from "react-router-dom";
 import { useAuth } from "../lib/auth";
 import { ApiError } from "../lib/api";
 import { t } from "../i18n";
-import { AuthLayout } from "../components/AuthLayout";
+import { AuthLayout, Emphasis } from "../components/AuthLayout";
 
 export function LoginPage() {
   const { login, me, loading, locale } = useAuth();
@@ -36,7 +36,9 @@ export function LoginPage() {
       <form className="card auth-card form-grid" onSubmit={onSubmit}>
         <div className="auth-logo">
           <h1>{t(locale, "login")}</h1>
-          <div className="muted">{t(locale, "welcome")}</div>
+          <div className="muted">
+            <Emphasis text={t(locale, "welcome")} />
+          </div>
         </div>
         <label className="label">
           {t(locale, "email")}

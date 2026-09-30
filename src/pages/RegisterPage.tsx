@@ -2,7 +2,7 @@ import { FormEvent, useState } from "react";
 import { Link, Navigate } from "react-router-dom";
 import { useAuth } from "../lib/auth";
 import { t, type Locale } from "../i18n";
-import { AuthLayout } from "../components/AuthLayout";
+import { AuthLayout, Emphasis } from "../components/AuthLayout";
 
 export function RegisterPage() {
   const { register, me, loading, locale, setLocale } = useAuth();
@@ -39,7 +39,9 @@ export function RegisterPage() {
       <form className="card auth-card form-grid" onSubmit={onSubmit}>
         <div className="auth-logo">
           <h1>{t(locale, "register")}</h1>
-          <div className="muted">{t(locale, "welcome")}</div>
+          <div className="muted">
+            <Emphasis text={t(locale, "welcome")} />
+          </div>
         </div>
         <label className="label">
           {t(locale, "fullName")}

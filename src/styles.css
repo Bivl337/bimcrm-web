@@ -188,6 +188,42 @@ button {
   background: #fff;
 }
 
+/* Full logo (mark + wordmark), cropped to content */
+.brand .brand-logo {
+  display: block;
+  flex: none;
+  height: 64px;
+  width: auto;
+  border: none;
+  border-radius: 0;
+  background: none;
+}
+
+.sidebar .brand {
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  padding: 0 4px;
+}
+
+.mobile-bar .brand .brand-logo {
+  height: 40px;
+}
+
+.auth-logo-tile {
+  display: inline-flex;
+  align-self: flex-start;
+  padding: 12px 18px;
+  background: #fff;
+  border-radius: 16px;
+}
+
+.auth-logo-tile img {
+  display: block;
+  height: 88px;
+  width: auto;
+}
+
 .brand-title {
   font-size: 1.125rem;
   font-weight: 600;
@@ -200,6 +236,7 @@ button {
 }
 
 .brand-org {
+  max-width: 100%;
   font-size: var(--text-meta);
   color: var(--muted);
   white-space: nowrap;
@@ -1066,6 +1103,14 @@ button {
   font-size: var(--text-secondary);
 }
 
+.u-emph {
+  color: var(--ink);
+  text-decoration: underline;
+  text-decoration-color: var(--accent);
+  text-decoration-thickness: 2px;
+  text-underline-offset: 4px;
+}
+
 .auth-card .btn {
   min-height: 44px;
   margin-top: 4px;
@@ -1192,6 +1237,15 @@ button {
 
   .auth-plan h2 {
     font-size: 1.5rem;
+  }
+
+  .auth-logo-tile {
+    padding: 8px 12px;
+    border-radius: 12px;
+  }
+
+  .auth-logo-tile img {
+    height: 56px;
   }
 
   .auth-plan p {
