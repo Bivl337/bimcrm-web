@@ -1124,6 +1124,121 @@ button {
 }
 
 /* ==========================================================================
+   Feedback widget (corner lead form)
+   ========================================================================== */
+
+.feedback {
+  position: fixed;
+  right: 24px;
+  bottom: 24px;
+  z-index: 45;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 12px;
+}
+
+.feedback-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 48px;
+  padding: 0 18px;
+  border: 1px solid var(--border-strong);
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--ink);
+  font-size: var(--text-secondary);
+  font-weight: 500;
+  box-shadow: var(--shadow-2);
+  transition: background var(--dur-fast) var(--ease), border-color var(--dur-fast) var(--ease);
+}
+
+.feedback-toggle svg {
+  color: var(--accent);
+}
+
+.feedback-toggle:hover {
+  background: var(--surface-sunken);
+  border-color: rgba(20, 26, 42, 0.24);
+}
+
+.feedback-panel {
+  width: min(360px, calc(100vw - 32px));
+  max-height: calc(100vh - 120px);
+  overflow: auto;
+  padding: 20px;
+  border-radius: 16px;
+  box-shadow: var(--shadow-overlay);
+  animation: modal-in var(--dur) var(--ease);
+}
+
+.feedback-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 4px;
+}
+
+.feedback-head h2 {
+  margin: 0;
+  font-size: var(--text-h3);
+}
+
+.feedback-lead {
+  margin: 0;
+  font-size: var(--text-secondary);
+}
+
+.feedback-hp {
+  position: absolute;
+  left: -9999px;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+}
+
+.feedback-done {
+  display: grid;
+  gap: 8px;
+  justify-items: start;
+}
+
+.feedback-done p {
+  margin: 0;
+  font-size: var(--text-secondary);
+}
+
+.feedback-done .feedback-done-title {
+  font-size: var(--text-body);
+  font-weight: 500;
+  color: var(--ink);
+}
+
+.feedback-done .btn {
+  margin-top: 8px;
+}
+
+.field-error {
+  font-size: var(--text-meta);
+  font-weight: 400;
+  color: var(--danger);
+}
+
+.input[aria-invalid="true"],
+.textarea[aria-invalid="true"] {
+  border-color: var(--danger);
+}
+
+@media (max-width: 767.98px) {
+  .feedback {
+    right: 16px;
+    bottom: 16px;
+  }
+}
+
+/* ==========================================================================
    Responsive: medium (≤1024) and narrow (≤767)
    ========================================================================== */
 

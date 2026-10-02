@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import { useAuth } from "../lib/auth";
 import { t } from "../i18n";
+import { FeedbackWidget } from "./FeedbackWidget";
 
 /** Renders a phrase where [word] is underlined, e.g. "Система под [любые] Ваши процессы". */
 export function Emphasis({ text }: { text: string }) {
@@ -42,6 +43,7 @@ export function AuthLayout({ children }: { children: ReactNode }) {
         <div className="auth-foot">{t(locale, "authFoot")}</div>
       </aside>
       <main className="auth-main">{children}</main>
+      <FeedbackWidget />
     </div>
   );
 }
