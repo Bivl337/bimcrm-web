@@ -9,7 +9,12 @@ type Status = "idle" | "sending" | "sent";
 /** Corner lead form: contact + need -> POST /api/feedback -> owner's Telegram. */
 export function FeedbackWidget() {
   const { locale } = useAuth();
-  const [open, setOpen] = useState(false);
+  // Open by default on wide screens; on phones it would cover the login form, so it starts collapsed.
+  const [open, setOpen] = useState(
+    () => typeof window !== "undefined" && window.matchMedia("(min-width: 768px)").matches
+  );
+  // Don't steal focus from the login form when the panel is open on page load.
+  const openedByUser = useRef(false);
   const [contact, setContact] = useState("");
   const [need, setNeed] = useState("");
   const [website, setWebsite] = useState(""); // honeypot, hidden from people
@@ -25,7 +30,7 @@ export function FeedbackWidget() {
 
   useEffect(() => {
     if (!open) return;
-    contactRef.current?.focus();
+    if (openedByUser.current) contactRef.current?.focus();
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") close();
     };
@@ -35,7 +40,8 @@ export function FeedbackWidget() {
 
   const close = () => {
     setOpen(false);
-    toggleRef.current?.focus();
+    if (openedByUser.current) toggleRef.current?.focus();
+    openedByUser.current = true;
     if (status === "sent") {
       setStatus("idle");
       setContact("");
@@ -153,7 +159,11 @@ export function FeedbackWidget() {
         type="button"
         className="feedback-toggle"
         aria-expanded={open}
-        onClick={() => (open ? close() : setOpen(true))}
+        onClick={() => {
+          openedByUser.current = true;
+          if (open) close();
+          else setOpen(true);
+        }}
       >
         <IconChat size={18} />
         {t(locale, "fbOpen")}
